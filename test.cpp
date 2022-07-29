@@ -34,7 +34,7 @@ void stepper::TurnByDegrees(int Degrees){
   steps = Degrees / degreesPerStep;
 //  Serial.println(String(targetMotor)+":"+String(currentPosition);
 //  
-  Step(steps);
+//  Step(steps);
 }
 
 void stepper::TurnTo(int Targetposition){
@@ -43,12 +43,12 @@ void stepper::TurnTo(int Targetposition){
     
     if (Targetposition > currentPosition){
       while (Targetposition > currentPosition){
-        Step(1);
+//        Step(1);
       }
     }
     else{
       while (Targetposition < currentPosition){
-        Step(-1);
+//        Ministep(-1);
       } 
     }
   }else{
@@ -56,28 +56,28 @@ void stepper::TurnTo(int Targetposition){
   }
 }
 
-void stepper::Step(int num) {
-  if (num > 0){
-      for (int i=0; i<7; i++){
-        digitalWrite(_pin1, pin1sequence[i]);
-        digitalWrite(_pin2, pin2sequence[i]);
-        digitalWrite(_pin3, pin3sequence[i]);
-        digitalWrite(_pin4, pin4sequence[i]);
-        delayMicroseconds(1200);
-       }
-       currentPosition = currentPosition + degreesPerStep;
-  }
-  else{
-    for (int i=7; i>0; i--){
-      digitalWrite(_pin4, pin4sequence[i]);
-      digitalWrite(_pin3, pin3sequence[i]);
-      digitalWrite(_pin2, pin2sequence[i]);   
-      digitalWrite(_pin1, pin1sequence[i]);
-      delayMicroseconds(1200);
-    }
-    if (currentPosition < 0){currentPosition=currentPosition+360;}
-    currentPosition = currentPosition - degreesPerStep;
-  }
-  Serial.println(currentPosition);
-  turnOFF();
+void stepper::Ministep() {
+  if (currentPhase == 8){currentPhase = 0;}
+  digitalWrite(_pin1, pin1sequence[currentPhase]);
+  digitalWrite(_pin2, pin2sequence[currentPhase]);
+  digitalWrite(_pin3, pin3sequence[currentPhase]);
+  digitalWrite(_pin4, pin4sequence[currentPhase]);
+
+  currentPosition = currentPosition + degreesPerStep/8;
+
+  currentPhase = currentPhase + 1;
+//  turnOFF();
+}
+
+void stepper::Backministep() {
+  if (currentPhase == 0){currentPhase = 8;}
+  digitalWrite(_pin1, pin1sequence[currentPhase]);
+  digitalWrite(_pin2, pin2sequence[currentPhase]);
+  digitalWrite(_pin3, pin3sequence[currentPhase]);
+  digitalWrite(_pin4, pin4sequence[currentPhase]);
+
+  currentPosition = currentPosition - degreesPerStep/8;
+  currentPhase = currentPhase - 1;
+  
+//  turnOFF();
 }
